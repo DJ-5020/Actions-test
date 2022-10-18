@@ -1,0 +1,32 @@
+import csv
+from time import sleep
+import win32com.client as client
+
+# create template for message body
+template = "Dear {}," \
+           "\n\nWe could notice that your Jira project {} {} is inactive for more than 6 months."\
+           "\n\nKindly confirm if the project can be deleted/ archived."
+
+# open distribution list
+with open('people.csv', 'r', newline='') as f:
+    reader = csv.reader(f)
+    distro = [row for row in reader]
+
+# chunk distribution list into blocks of 30
+chunks = [distro[x:x+30] for x in range(0, len(distro), 30)]
+
+# create outlook instance
+outlook = client.Dispatch('Outlook.Application')
+
+# iterate through chunks and send mail
+for chunk in chunks:
+    # iterate through each recipient in chunk and send mail
+    for ID,PNAME,URL,LEAD,address in chunk:
+        message = outlook.CreateItem(0)
+        message.To = address
+        message.Subject = "Your Jira project is inactive for past 6 months"
+        message.Body = template.format(LEAD,PNAME,URL)
+        message.Send()
+
+    # wait 60 seconds before sending next chunk
+    sleep(60)
