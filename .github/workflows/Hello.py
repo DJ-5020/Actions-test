@@ -1,1 +1,1 @@
-Print ("Hello ECS Team, Welcome to GitHub Actions")
+print("Hello ECS Team, Welcome to GitHub Actions")
